@@ -7,9 +7,9 @@
 \title{rcctz: Vendor 'CCTZ' Headers}
 \description{
 Provides access to the 'CCTZ' headers. 'CCTZ'
-    contains two libraries that cooperate with the C++ 'chrono' to give C++
-    programmers all the necessary tools for computing with dates, times,
-    and time zones in a simple and correct manner.
+    contains two libraries that cooperate with the C++ 'chrono' library to
+    give C++ programmers all the necessary tools for computing with dates,
+    times, and time zones in a simple and correct manner.
 }
 \seealso{
 Useful links:
