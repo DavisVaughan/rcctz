@@ -268,110 +268,117 @@ inline time_point<seconds> convert(const civil_second& cs,
   return cl.pre;
 }
 
-namespace detail {
-using femtoseconds = std::chrono::duration<std::int_fast64_t, std::femto>;
-std::string format(const std::string&, const time_point<seconds>&,
-                   const femtoseconds&, const time_zone&);
-bool parse(const std::string&, const std::string&, const time_zone&,
-           time_point<seconds>*, femtoseconds*, std::string* err = nullptr);
-}  // namespace detail
-
-// Formats the given time_point in the given cctz::time_zone according to
-// the provided format string. Uses strftime()-like formatting options,
-// with the following extensions:
+// Start changes - DV
+// Change:
+//   Comment out format() and parse(), as they are currently not enabled.
+//   See `tools/update.R` for more information.
 //
-//   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
-//   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-//   - %E#S - Seconds with # digits of fractional precision
-//   - %E*S - Seconds with full fractional precision (a literal '*')
-//   - %E#f - Fractional seconds with # digits of precision
-//   - %E*f - Fractional seconds with full precision (a literal '*')
-//   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
-//   - %ET  - The RFC3339 "date-time" separator "T"
+// namespace detail {
+// using femtoseconds = std::chrono::duration<std::int_fast64_t, std::femto>;
+// std::string format(const std::string&, const time_point<seconds>&,
+//                    const femtoseconds&, const time_zone&);
+// bool parse(const std::string&, const std::string&, const time_zone&,
+//            time_point<seconds>*, femtoseconds*, std::string* err = nullptr);
+// }  // namespace detail
 //
-// Note that %E0S behaves like %S, and %E0f produces no characters. In
-// contrast %E*f always produces at least one digit, which may be '0'.
+// // Formats the given time_point in the given cctz::time_zone according to
+// // the provided format string. Uses strftime()-like formatting options,
+// // with the following extensions:
+// //
+// //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
+// //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
+// //   - %E#S - Seconds with # digits of fractional precision
+// //   - %E*S - Seconds with full fractional precision (a literal '*')
+// //   - %E#f - Fractional seconds with # digits of precision
+// //   - %E*f - Fractional seconds with full precision (a literal '*')
+// //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
+// //   - %ET  - The RFC3339 "date-time" separator "T"
+// //
+// // Note that %E0S behaves like %S, and %E0f produces no characters. In
+// // contrast %E*f always produces at least one digit, which may be '0'.
+// //
+// // Note that %Y produces as many characters as it takes to fully render the
+// // year. A year outside of [-999:9999] when formatted with %E4Y will produce
+// // more than four characters, just like %Y.
+// //
+// // Tip: Format strings should include the UTC offset (e.g., %z, %Ez, or %E*z)
+// // so that the resulting string uniquely identifies an absolute time.
+// //
+// // Example:
+// //   cctz::time_zone lax;
+// //   if (!cctz::load_time_zone("America/Los_Angeles", &lax)) { ... }
+// //   auto tp = cctz::convert(cctz::civil_second(2013, 1, 2, 3, 4, 5), lax);
+// //   std::string f = cctz::format("%H:%M:%S", tp, lax);  // "03:04:05"
+// //   f = cctz::format("%H:%M:%E3S", tp, lax);            // "03:04:05.000"
+// template <typename D>
+// inline std::string format(const std::string& fmt, const time_point<D>& tp,
+//                           const time_zone& tz) {
+//   const auto p = detail::split_seconds(tp);
+//   const auto n = std::chrono::duration_cast<detail::femtoseconds>(p.second);
+//   return detail::format(fmt, p.first, n, tz);
+// }
 //
-// Note that %Y produces as many characters as it takes to fully render the
-// year. A year outside of [-999:9999] when formatted with %E4Y will produce
-// more than four characters, just like %Y.
-//
-// Tip: Format strings should include the UTC offset (e.g., %z, %Ez, or %E*z)
-// so that the resulting string uniquely identifies an absolute time.
-//
-// Example:
-//   cctz::time_zone lax;
-//   if (!cctz::load_time_zone("America/Los_Angeles", &lax)) { ... }
-//   auto tp = cctz::convert(cctz::civil_second(2013, 1, 2, 3, 4, 5), lax);
-//   std::string f = cctz::format("%H:%M:%S", tp, lax);  // "03:04:05"
-//   f = cctz::format("%H:%M:%E3S", tp, lax);            // "03:04:05.000"
-template <typename D>
-inline std::string format(const std::string& fmt, const time_point<D>& tp,
-                          const time_zone& tz) {
-  const auto p = detail::split_seconds(tp);
-  const auto n = std::chrono::duration_cast<detail::femtoseconds>(p.second);
-  return detail::format(fmt, p.first, n, tz);
-}
-
-// Parses an input string according to the provided format string and
-// returns the corresponding time_point. Uses strftime()-like formatting
-// options, with the same extensions as cctz::format(), but with the
-// exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f. %Ez
-// and %E*z also accept the same inputs, which (along with %z) includes
-// 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
-//
-// %Y consumes as many numeric characters as it can, so the matching data
-// should always be terminated with a non-numeric. %E4Y always consumes
-// exactly four characters, including any sign.
-//
-// Unspecified fields are taken from the default date and time of ...
-//
-//   "1970-01-01 00:00:00.0 +0000"
-//
-// For example, parsing a string of "15:45" (%H:%M) will return a time_point
-// that represents "1970-01-01 15:45:00.0 +0000".
-//
-// Note that parse() returns time instants, so it makes most sense to parse
-// fully-specified date/time strings that include a UTC offset (%z, %Ez, or
-// %E*z).
-//
-// Note also that parse() only heeds the fields year, month, day, hour,
-// minute, (fractional) second, and UTC offset. Other fields, like weekday (%a
-// or %A), while parsed for syntactic validity, are ignored in the conversion.
-//
-// Date and time fields that are out-of-range will be treated as errors rather
-// than normalizing them like cctz::civil_second() would do. For example, it
-// is an error to parse the date "Oct 32, 2013" because 32 is out of range.
-//
-// A second of ":60" is normalized to ":00" of the following minute with
-// fractional seconds discarded. The following table shows how the given
-// seconds and subseconds will be parsed:
-//
-//   "59.x" -> 59.x  // exact
-//   "60.x" -> 00.0  // normalized
-//   "00.x" -> 00.x  // exact
-//
-// Errors are indicated by returning false.
-//
-// Example:
-//   const cctz::time_zone tz = ...
-//   std::chrono::system_clock::time_point tp;
-//   if (cctz::parse("%Y-%m-%d", "2015-10-09", tz, &tp)) {
-//     ...
+// // Parses an input string according to the provided format string and
+// // returns the corresponding time_point. Uses strftime()-like formatting
+// // options, with the same extensions as cctz::format(), but with the
+// // exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f. %Ez
+// // and %E*z also accept the same inputs, which (along with %z) includes
+// // 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
+// //
+// // %Y consumes as many numeric characters as it can, so the matching data
+// // should always be terminated with a non-numeric. %E4Y always consumes
+// // exactly four characters, including any sign.
+// //
+// // Unspecified fields are taken from the default date and time of ...
+// //
+// //   "1970-01-01 00:00:00.0 +0000"
+// //
+// // For example, parsing a string of "15:45" (%H:%M) will return a time_point
+// // that represents "1970-01-01 15:45:00.0 +0000".
+// //
+// // Note that parse() returns time instants, so it makes most sense to parse
+// // fully-specified date/time strings that include a UTC offset (%z, %Ez, or
+// // %E*z).
+// //
+// // Note also that parse() only heeds the fields year, month, day, hour,
+// // minute, (fractional) second, and UTC offset. Other fields, like weekday (%a
+// // or %A), while parsed for syntactic validity, are ignored in the conversion.
+// //
+// // Date and time fields that are out-of-range will be treated as errors rather
+// // than normalizing them like cctz::civil_second() would do. For example, it
+// // is an error to parse the date "Oct 32, 2013" because 32 is out of range.
+// //
+// // A second of ":60" is normalized to ":00" of the following minute with
+// // fractional seconds discarded. The following table shows how the given
+// // seconds and subseconds will be parsed:
+// //
+// //   "59.x" -> 59.x  // exact
+// //   "60.x" -> 00.0  // normalized
+// //   "00.x" -> 00.x  // exact
+// //
+// // Errors are indicated by returning false.
+// //
+// // Example:
+// //   const cctz::time_zone tz = ...
+// //   std::chrono::system_clock::time_point tp;
+// //   if (cctz::parse("%Y-%m-%d", "2015-10-09", tz, &tp)) {
+// //     ...
+// //   }
+// template <typename D>
+// inline bool parse(const std::string& fmt, const std::string& input,
+//                   const time_zone& tz, time_point<D>* tpp) {
+//   time_point<seconds> sec;
+//   detail::femtoseconds fs;
+//   const bool b = detail::parse(fmt, input, tz, &sec, &fs);
+//   if (b) {
+//     // TODO: Return false if unrepresentable as a time_point<D>.
+//     *tpp = std::chrono::time_point_cast<D>(sec);
+//     *tpp += std::chrono::duration_cast<D>(fs);
 //   }
-template <typename D>
-inline bool parse(const std::string& fmt, const std::string& input,
-                  const time_zone& tz, time_point<D>* tpp) {
-  time_point<seconds> sec;
-  detail::femtoseconds fs;
-  const bool b = detail::parse(fmt, input, tz, &sec, &fs);
-  if (b) {
-    // TODO: Return false if unrepresentable as a time_point<D>.
-    *tpp = std::chrono::time_point_cast<D>(sec);
-    *tpp += std::chrono::duration_cast<D>(fs);
-  }
-  return b;
-}
+//   return b;
+// }
+//
+// Stop changes - DV
 
 }  // namespace cctz
 

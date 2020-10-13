@@ -27,3 +27,10 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("DavisVaughan/rcctz")
 ```
+
+## Limitations
+
+Because of issues with Windows on R \< 4.0.0, the `cctz::parse()` and
+`cctz::format()` functions don’t currently work and have been removed
+from the library. However, CCTZ is extremely useful even without these
+features. In the future, they might be added back in.
