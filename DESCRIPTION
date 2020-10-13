@@ -21,3 +21,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 SystemRequirements: 
     C++11
+Suggests: 
+    testthat
+Config/testthat/edition: 2
