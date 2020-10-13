@@ -19,6 +19,16 @@ inline cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
   return fn(cs, tz);
 }
 
+inline cctz::time_point<cctz::seconds> convert_civil(const cctz::civil_second& cs,
+                                                     const cctz::time_zone tz) {
+  typedef cctz::time_point<cctz::seconds> fn_ptr(const cctz::civil_second& cs,
+                                                 const cctz::time_zone tz);
+
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "convert_civil");
+
+  return fn(cs, tz);
+}
+
 inline cctz::time_zone::absolute_lookup lookup_time_point(const cctz::time_point<cctz::seconds>& tp,
                                                           const cctz::time_zone tz) {
   typedef cctz::time_zone::absolute_lookup fn_ptr(const cctz::time_point<cctz::seconds>& tp,

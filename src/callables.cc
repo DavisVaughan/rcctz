@@ -8,6 +8,11 @@ cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
   return tz.lookup(cs);
 }
 
+cctz::time_point<cctz::seconds> convert_civil(const cctz::civil_second& cs,
+                                              const cctz::time_zone tz) {
+  return cctz::convert(cs, tz);
+}
+
 // -----------------------------------------------------------------------------
 // Time point
 

@@ -15,6 +15,7 @@ static const R_CallMethodDef CallEntries[] = {
 
 extern "C" void R_init_rcctz(DllInfo *dll) {
   R_RegisterCCallable("rcctz", "lookup_civil", (DL_FUNC) &lookup_civil);
+  R_RegisterCCallable("rcctz", "convert_civil", (DL_FUNC) &convert_civil);
   R_RegisterCCallable("rcctz", "lookup_time_point", (DL_FUNC) &lookup_time_point);
   R_RegisterCCallable("rcctz", "tz_load", (DL_FUNC) &tz_load);
 
