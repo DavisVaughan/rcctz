@@ -2,11 +2,12 @@ Package: rcctz
 Title: Vendor 'CCTZ' Headers
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    c(person(given = "Davis",
+             family = "Vaughan",
+             role = c("aut", "cre"),
+             email = "davis@rstudio.com"),
+      person(given = "RStudio",
+             role = "cph"))
 Description: Provides access to the 'CCTZ' headers. 'CCTZ'
     contains two libraries that cooperate with the C++ 'chrono' to give C++
     programmers all the necessary tools for computing with dates, times,
