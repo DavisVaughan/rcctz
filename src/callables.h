@@ -3,6 +3,7 @@
 
 #include <cctz/civil_time.h>
 #include <cctz/time_zone.h>
+#include "r.h"
 
 // -----------------------------------------------------------------------------
 // Civil
@@ -26,5 +27,10 @@ cctz::civil_second convert_time_point(const cctz::time_point<cctz::seconds>& tp,
 // Time zone loading
 
 bool tz_load(const std::string& name, cctz::time_zone* tz);
+
+std::string tz_from_tzone(SEXP tzone);
+
+// Just for testing
+const char* tz_local();
 
 #endif

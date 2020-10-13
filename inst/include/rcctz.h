@@ -56,6 +56,14 @@ inline bool tz_load(const std::string& name, cctz::time_zone* tz) {
 
   return fn(name, tz);
 }
+
+inline std::string tz_from_tzone(SEXP tzone) {
+  typedef std::string fn_ptr(SEXP tzone);
+
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "tz_from_tzone");
+
+  return fn(tzone);
+}
 }
 
 #endif
