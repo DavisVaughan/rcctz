@@ -39,6 +39,16 @@ inline cctz::time_zone::absolute_lookup lookup_time_point(const cctz::time_point
   return fn(tp, tz);
 }
 
+inline cctz::civil_second convert_time_point(const cctz::time_point<cctz::seconds>& tp,
+                                             const cctz::time_zone tz) {
+  typedef cctz::civil_second fn_ptr(const cctz::time_point<cctz::seconds>& tp,
+                                    const cctz::time_zone tz);
+
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "convert_time_point");
+
+  return fn(tp, tz);
+}
+
 inline bool tz_load(const std::string& name, cctz::time_zone* tz) {
   typedef bool fn_ptr(const std::string& name, cctz::time_zone* tz);
 
