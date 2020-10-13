@@ -3,10 +3,9 @@
 // -----------------------------------------------------------------------------
 // Civil
 
-void lookup_civil(const cctz::civil_second& cs,
-                  const cctz::time_zone tz,
-                  cctz::time_zone::civil_lookup* cl) {
-  *cl = tz.lookup(cs);
+cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
+                                           const cctz::time_zone tz) {
+  return tz.lookup(cs);
 }
 
 // -----------------------------------------------------------------------------

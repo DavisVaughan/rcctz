@@ -7,9 +7,8 @@
 // -----------------------------------------------------------------------------
 // Civil
 
-void lookup_civil(const cctz::civil_second& cs,
-                  const cctz::time_zone tz,
-                  cctz::time_zone::civil_lookup* cl);
+cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
+                                           const cctz::time_zone tz);
 
 // -----------------------------------------------------------------------------
 // Time zone loading
