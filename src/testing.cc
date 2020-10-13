@@ -38,6 +38,40 @@ SEXP rcctz_lookup_civil(SEXP year,
 }
 
 extern "C"
+SEXP rcctz_convert_civil(SEXP year,
+                         SEXP month,
+                         SEXP day,
+                         SEXP hour,
+                         SEXP minute,
+                         SEXP second,
+                         SEXP tzone) {
+  cctz::civil_second cs = cctz::civil_second(
+    INTEGER(year)[0],
+    INTEGER(month)[0],
+    INTEGER(day)[0],
+    INTEGER(hour)[0],
+    INTEGER(minute)[0],
+    INTEGER(second)[0]
+  );
+
+  cctz::time_zone tz;
+  std::string cpp_tz = tz_from_tzone(tzone);
+
+  if (!tz_load(cpp_tz, &tz)) {
+    Rf_errorcall(R_NilValue, "Failed to load time zone.");
+  }
+
+  cctz::time_point<cctz::seconds> tp = convert_civil(cs, tz);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, 1));
+
+  REAL(out)[0] = tp.time_since_epoch().count();
+
+  UNPROTECT(1);
+  return out;
+}
+
+extern "C"
 SEXP rcctz_tz_local() {
   return Rf_ScalarString(Rf_mkCharCE(tz_local(), CE_UTF8));
 }
