@@ -9,23 +9,33 @@
 #include <stdbool.h>
 
 namespace rcctz {
-  inline cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
-                                                    const cctz::time_zone tz) {
-    typedef cctz::time_zone::civil_lookup fn_ptr(const cctz::civil_second& cs,
-                                                 const cctz::time_zone tz);
+inline cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
+                                                  const cctz::time_zone tz) {
+  typedef cctz::time_zone::civil_lookup fn_ptr(const cctz::civil_second& cs,
+                                               const cctz::time_zone tz);
 
-    static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "lookup_civil");
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "lookup_civil");
 
-    return fn(cs, tz);
-  }
+  return fn(cs, tz);
+}
 
-  inline bool tz_load(const std::string& name, cctz::time_zone* tz) {
-    typedef bool fn_ptr(const std::string& name, cctz::time_zone* tz);
+inline cctz::time_zone::absolute_lookup lookup_time_point(const cctz::time_point<cctz::seconds>& tp,
+                                                          const cctz::time_zone tz) {
+  typedef cctz::time_zone::absolute_lookup fn_ptr(const cctz::time_point<cctz::seconds>& tp,
+                                                  const cctz::time_zone tz);
 
-    static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "tz_load");
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "lookup_time_point");
 
-    return fn(name, tz);
-  }
+  return fn(tp, tz);
+}
+
+inline bool tz_load(const std::string& name, cctz::time_zone* tz) {
+  typedef bool fn_ptr(const std::string& name, cctz::time_zone* tz);
+
+  static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "tz_load");
+
+  return fn(name, tz);
+}
 }
 
 #endif
