@@ -106,7 +106,10 @@ test_that("`TZ` warns if set to empty string and falls back to system tz", {
   skip_if_bad_sys_timezone()
 
   expect_identical(
-    withr::with_envvar(new = c("TZ" = ""), tz_local()),
+    expect_warning(
+      withr::with_envvar(new = c("TZ" = ""), tz_local()),
+      "Using system time zone"
+    ),
     tz_system()
   )
 })
