@@ -69,6 +69,32 @@ test_that("can convert time point", {
   expect_identical(convert_time_point(tzone = "America/New_York"), c(1969L, 12L, 31L, 19L, 0L, 0L))
 })
 
+test_that("can do a forced time zone change", {
+  expect_identical(
+    force_tz(0L, "UTC", "America/New_York", "boundary"),
+    as.POSIXct("1970-01-01", tz = "America/New_York")
+  )
+
+  test <- as.integer(as.POSIXct("1970-04-26 02:00:01", tz = "UTC"))
+
+  expect_identical(
+    force_tz(test, "UTC", "America/New_York", "boundary"),
+    as.POSIXct("1970-04-26 03:00:00", tz = "America/New_York")
+  )
+  expect_identical(
+    force_tz(test, "UTC", "America/New_York", "original"),
+    as.POSIXct("1970-04-26 03:00:01", tz = "America/New_York")
+  )
+  expect_identical(
+    force_tz(test, "UTC", "America/New_York", "new"),
+    as.POSIXct("1970-04-26 01:00:01", tz = "America/New_York")
+  )
+  expect_identical(
+    force_tz(test, "UTC", "America/New_York", "missing"),
+    as.POSIXct(NA_character_, tz = "America/New_York")
+  )
+})
+
 test_that("`TZ` is used if set", {
   expect_identical(
     withr::with_envvar(new = c("TZ" = "foo"), tz_local()),

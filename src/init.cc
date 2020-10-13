@@ -10,6 +10,7 @@ extern "C" SEXP rcctz_lookup_civil(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern "C" SEXP rcctz_convert_civil(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern "C" SEXP rcctz_lookup_time_point(SEXP, SEXP);
 extern "C" SEXP rcctz_convert_time_point(SEXP, SEXP);
+extern "C" SEXP rcctz_force_tz(SEXP, SEXP, SEXP, SEXP);
 extern "C" SEXP rcctz_tz_local();
 extern "C" SEXP rcctz_tz_system();
 
@@ -19,6 +20,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"rcctz_convert_civil",       (DL_FUNC) &rcctz_convert_civil, 7},
   {"rcctz_lookup_time_point",   (DL_FUNC) &rcctz_lookup_time_point, 2},
   {"rcctz_convert_time_point",  (DL_FUNC) &rcctz_convert_time_point, 2},
+  {"rcctz_force_tz",            (DL_FUNC) &rcctz_force_tz, 4},
   {"rcctz_tz_local",            (DL_FUNC) &rcctz_tz_local, 0},
   {"rcctz_tz_system",           (DL_FUNC) &rcctz_tz_system, 0},
   {NULL, NULL, 0}

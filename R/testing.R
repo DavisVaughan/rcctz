@@ -28,6 +28,11 @@ convert_time_point <- function(point = 0L, tzone = "UTC") {
   .Call(rcctz_convert_time_point, point, tzone)
 }
 
+force_tz <- function(x, tzone_from, tzone_to, dst) {
+  out <- .Call(rcctz_force_tz, x, tzone_from, tzone_to, dst)
+  new_posixct(out, tzone_to)
+}
+
 tz_local <- function() {
   .Call(rcctz_tz_local)
 }

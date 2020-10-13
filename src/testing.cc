@@ -131,6 +131,63 @@ SEXP rcctz_convert_time_point(SEXP point, SEXP tzone) {
 }
 
 extern "C"
+SEXP rcctz_force_tz(SEXP x, SEXP tzone_from, SEXP tzone_to, SEXP dst) {
+  const char* c_dst = CHAR(STRING_ELT(dst, 0));
+  bool dst_original = !strcmp(c_dst, "original");
+  bool dst_new = !strcmp(c_dst, "new");
+  bool dst_boundary = !strcmp(c_dst, "boundary");
+  bool dst_missing = !strcmp(c_dst, "missing");
+
+  cctz::seconds sec(INTEGER(x)[0]);
+  cctz::time_point<cctz::seconds> tp(sec);
+
+  cctz::time_zone tz_from;
+  std::string cpp_tz_from = tz_from_tzone(tzone_from);
+
+  cctz::time_zone tz_to;
+  std::string cpp_tz_to = tz_from_tzone(tzone_to);
+
+  if (!tz_load(cpp_tz_from, &tz_from)) {
+    Rf_errorcall(R_NilValue, "Failed to load time zone.");
+  }
+  if (!tz_load(cpp_tz_to, &tz_to)) {
+    Rf_errorcall(R_NilValue, "Failed to load time zone.");
+  }
+
+  cctz::civil_second cs = convert_time_point(tp, tz_from);
+  cctz::time_zone::civil_lookup cl = lookup_civil(cs, tz_to);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, 1));
+  double* p_out = REAL(out);
+
+  if (cl.kind == cctz::time_zone::civil_lookup::UNIQUE) {
+    p_out[0] = cl.trans.time_since_epoch().count();
+    UNPROTECT(1);
+    return out;
+  }
+
+  if (cl.kind == cctz::time_zone::civil_lookup::SKIPPED ||
+      cl.kind == cctz::time_zone::civil_lookup::REPEATED) {
+    if (dst_original) {
+      p_out[0] = cl.pre.time_since_epoch().count();
+    } else if (dst_new) {
+      p_out[0] = cl.post.time_since_epoch().count();
+    } else if (dst_boundary) {
+      p_out[0] = cl.trans.time_since_epoch().count();
+    } else if (dst_missing) {
+      p_out[0] = NA_REAL;
+    } else {
+      Rf_errorcall(R_NilValue, "Unknown dst");
+    }
+
+    UNPROTECT(1);
+    return out;
+  }
+
+  Rf_errorcall(R_NilValue, "Should never get here");
+}
+
+extern "C"
 SEXP rcctz_tz_local() {
   return Rf_ScalarString(Rf_mkCharCE(tz_local(), CE_UTF8));
 }
