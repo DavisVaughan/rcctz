@@ -8,6 +8,7 @@ library(glue)
 remove_src <- c(
   "cctz_benchmark.cc",
   "civil_time_test.cc",
+  "time_tool.cc",
   "time_zone_format_test.cc",
   "time_zone_lookup_test.cc"
 )
