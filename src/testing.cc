@@ -1,4 +1,4 @@
-#include "examples.h"
+#include "testing.h"
 #include <cctz/civil_time.h>
 
 SEXP cctz_test_civil_day() {

@@ -4,7 +4,7 @@
 #include "r.h"
 
 // -----------------------------------------------------------------------------
-// #include "examples.h"
+// #include "testing.h"
 
 extern "C" SEXP export_cctz_test_civil_day();
 
