@@ -1,5 +1,3 @@
-# nocov start
-
 .onLoad <- function(libname, pkgname) {
   set_tzdir()
 }
@@ -49,5 +47,3 @@ set_tzdir <- function() {
     call. = FALSE
   )
 }
-
-# nocov end
