@@ -9,8 +9,9 @@
 
 // .Call entries
 static const R_CallMethodDef CallEntries[] = {
-  {"export_cctz_test_civil_day", (DL_FUNC) &export_cctz_test_civil_day, 0},
-  {"export_tz_local",            (DL_FUNC) &export_tz_local, 0},
+  {"export_cctz_test_civil_day",    (DL_FUNC) &export_cctz_test_civil_day, 0},
+  {"export_cctz_test_lookup_civil", (DL_FUNC) &export_cctz_test_lookup_civil, 7},
+  {"export_tz_local",               (DL_FUNC) &export_tz_local, 0},
   {NULL, NULL, 0}
 };
 

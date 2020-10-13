@@ -5,4 +5,12 @@
 
 SEXP cctz_test_civil_day();
 
+SEXP cctz_test_lookup_civil(SEXP year,
+                            SEXP month,
+                            SEXP day,
+                            SEXP hour,
+                            SEXP minute,
+                            SEXP second,
+                            SEXP tzone);
+
 #endif

@@ -8,6 +8,14 @@
 
 extern "C" SEXP export_cctz_test_civil_day();
 
+extern "C" SEXP export_cctz_test_lookup_civil(SEXP year,
+                                              SEXP month,
+                                              SEXP day,
+                                              SEXP hour,
+                                              SEXP minute,
+                                              SEXP second,
+                                              SEXP tzone);
+
 // -----------------------------------------------------------------------------
 // #include "callables.h"
 
