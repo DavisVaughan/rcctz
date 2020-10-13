@@ -22,5 +22,6 @@ RoxygenNote: 7.1.1
 SystemRequirements: 
     C++11
 Suggests: 
-    testthat
+    testthat,
+    covr
 Config/testthat/edition: 2

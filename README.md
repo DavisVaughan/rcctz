@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![R build
+status](https://github.com/DavisVaughan/rcctz/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/rcctz/actions)
 <!-- badges: end -->
 
 The goal of rcctz is to provide CCTZ headers in the most bare bones way
