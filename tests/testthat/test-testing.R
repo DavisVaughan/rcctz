@@ -1,7 +1,3 @@
-test_that("civil day test works", {
-  expect_identical(test_civil_day(), c(2016L, 2L, 1L))
-})
-
 test_that("civil second lookup works", {
   expect_identical(
     lookup_civil(tzone = "America/New_York"),

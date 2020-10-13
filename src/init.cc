@@ -6,14 +6,12 @@
 #include <stdbool.h> // for bool
 #include <R_ext/Rdynload.h>
 
-extern "C" SEXP rcctz_test_civil_day();
 extern "C" SEXP rcctz_lookup_civil(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern "C" SEXP rcctz_tz_local();
 extern "C" SEXP rcctz_tz_system();
 
 // .Call entries
 static const R_CallMethodDef CallEntries[] = {
-  {"rcctz_test_civil_day",      (DL_FUNC) &rcctz_test_civil_day, 0},
   {"rcctz_lookup_civil",        (DL_FUNC) &rcctz_lookup_civil, 7},
   {"rcctz_tz_local",            (DL_FUNC) &rcctz_tz_local, 0},
   {"rcctz_tz_system",           (DL_FUNC) &rcctz_tz_system, 0},

@@ -1,7 +1,3 @@
-test_civil_day <- function() {
-  .Call(rcctz_test_civil_day)
-}
-
 lookup_civil <- function(year = 1970L,
                          month = 1L,
                          day = 1L,
