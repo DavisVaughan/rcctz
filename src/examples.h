@@ -3,6 +3,6 @@
 
 #include "r.h"
 
-SEXP cctz_test();
+SEXP cctz_test_civil_day();
 
 #endif

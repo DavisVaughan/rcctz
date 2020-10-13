@@ -10,7 +10,7 @@ extern "C" {
 
   // .Call entries
   static const R_CallMethodDef CallEntries[] = {
-    {"export_cctz_test", (DL_FUNC) &export_cctz_test, 0},
+    {"export_cctz_test_civil_day", (DL_FUNC) &export_cctz_test_civil_day, 0},
     {NULL, NULL, 0}
   };
 

@@ -1,3 +1,3 @@
 test_that("example works", {
-  expect_identical(cctz_test(), c(2016L, 2L, 1L))
+  expect_identical(cctz_test_civil_day(), c(2016L, 2L, 1L))
 })

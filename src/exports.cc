@@ -3,6 +3,6 @@
 // -----------------------------------------------------------------------------
 #include "examples.h"
 
-extern "C" SEXP export_cctz_test() {
-  return cctz_test();
+extern "C" SEXP export_cctz_test_civil_day() {
+  return cctz_test_civil_day();
 }

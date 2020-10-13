@@ -1,7 +1,7 @@
 #include "examples.h"
 #include <cctz/civil_time.h>
 
-SEXP cctz_test() {
+SEXP cctz_test_civil_day() {
   cctz::civil_day d(2016, 2, 1);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, 3));
