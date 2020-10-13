@@ -1,22 +1,22 @@
+#include "callables.h" // Must be included before R headers
+#include "exports.h"
+
 #include <R.h>
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <stdbool.h> // for bool
 #include <R_ext/Rdynload.h>
 
-#include "exports.h"
+// .Call entries
+static const R_CallMethodDef CallEntries[] = {
+  {"export_cctz_test_civil_day", (DL_FUNC) &export_cctz_test_civil_day, 0},
+  {NULL, NULL, 0}
+};
 
-extern "C" {
+extern "C" void R_init_rcctz(DllInfo *dll) {
+  R_RegisterCCallable("rcctz", "lookup_civil", (DL_FUNC) &lookup_civil);
+  R_RegisterCCallable("rcctz", "tz_load", (DL_FUNC) &tz_load);
 
-  // .Call entries
-  static const R_CallMethodDef CallEntries[] = {
-    {"export_cctz_test_civil_day", (DL_FUNC) &export_cctz_test_civil_day, 0},
-    {NULL, NULL, 0}
-  };
-
-  void R_init_rcctz(DllInfo *dll) {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
-  }
-
-} // extern "C"
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
