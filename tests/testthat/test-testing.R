@@ -43,6 +43,32 @@ test_that("civil second conversion works", {
   expect_identical(fall2, expect4)
 })
 
+test_that("lookup time point works", {
+  x <- lookup_time_point(0L, "UTC")
+  y <- lookup_time_point(1L, "UTC")
+
+  expect_identical(x[[1]], c(1970L, 1L, 1L, 0L, 0L, 0L))
+  expect_identical(y[[1]], c(1970L, 1L, 1L, 0L, 0L, 1L))
+
+  test1 <- as.POSIXct("1970-04-26 01:59:59", tz = "America/New_York")
+  test2 <- test1 + 1L
+
+  a <- lookup_time_point(as.integer(test1), "America/New_York")
+  b <- lookup_time_point(as.integer(test2), "America/New_York")
+
+  expect_false(a[[2]])
+  expect_true(b[[2]])
+
+  expect_identical(a[[3]], -18000L)
+  expect_identical(b[[3]], -14400L)
+})
+
+test_that("can convert time point", {
+  expect_identical(convert_time_point(), c(1970L, 1L, 1L, 0L, 0L, 0L))
+  expect_identical(convert_time_point(-1L), c(1969L, 12L, 31L, 23L, 59L, 59L))
+  expect_identical(convert_time_point(tzone = "America/New_York"), c(1969L, 12L, 31L, 19L, 0L, 0L))
+})
+
 test_that("`TZ` is used if set", {
   expect_identical(
     withr::with_envvar(new = c("TZ" = "foo"), tz_local()),

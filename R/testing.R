@@ -20,6 +20,14 @@ convert_civil <- function(year = 1970L,
   new_posixct(out, tzone)
 }
 
+lookup_time_point <- function(point = 0L, tzone = "UTC") {
+  .Call(rcctz_lookup_time_point, point, tzone)
+}
+
+convert_time_point <- function(point = 0L, tzone = "UTC") {
+  .Call(rcctz_convert_time_point, point, tzone)
+}
+
 tz_local <- function() {
   .Call(rcctz_tz_local)
 }
