@@ -26,3 +26,21 @@ test_that("`TZ` is used if set", {
     "foo"
   )
 })
+
+test_that("`TZ` warns if set to empty string and falls back to system tz", {
+  skip_if_bad_sys_timezone()
+
+  expect_identical(
+    withr::with_envvar(new = c("TZ" = ""), tz_local()),
+    tz_system()
+  )
+})
+
+test_that("system time zone can be looked up", {
+  skip_if_bad_sys_timezone()
+
+  expect_identical(
+    Sys.timezone(),
+    tz_system()
+  )
+})

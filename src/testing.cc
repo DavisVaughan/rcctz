@@ -1,4 +1,4 @@
-#include "testing.h"
+#include "r.h"
 #include "callables.h"
 #include <cctz/civil_time.h>
 
@@ -56,4 +56,9 @@ SEXP rcctz_lookup_civil(SEXP year,
 extern "C"
 SEXP rcctz_tz_local() {
   return Rf_ScalarString(Rf_mkCharCE(tz_local(), CE_UTF8));
+}
+
+extern "C"
+SEXP rcctz_tz_system() {
+  return Rf_ScalarString(Rf_mkCharCE(tz_system(), CE_UTF8));
 }

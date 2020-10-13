@@ -16,3 +16,7 @@ lookup_civil <- function(year = 1970L,
 tz_local <- function() {
   .Call(rcctz_tz_local)
 }
+
+tz_system <- function() {
+  .Call(rcctz_tz_system)
+}

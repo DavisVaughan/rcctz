@@ -76,7 +76,7 @@ bool tz_load(const std::string& name, cctz::time_zone* tz) {
   return cctz::load_time_zone(name, tz);
 }
 
-static const char* tz_system();
+const char* tz_system();
 
 const char* tz_local() {
   const char* tz_env = std::getenv("TZ");
@@ -98,7 +98,7 @@ const char* tz_local() {
 
 static const char* tz_system_get();
 
-static const char* tz_system() {
+const char* tz_system() {
   // Once per session
   static const char* TZ_SYS = NULL;
 

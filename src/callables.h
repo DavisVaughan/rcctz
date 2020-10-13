@@ -32,5 +32,6 @@ std::string tz_from_tzone(SEXP tzone);
 
 // Just for testing
 const char* tz_local();
+const char* tz_system();
 
 #endif
