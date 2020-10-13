@@ -2,7 +2,8 @@
 #include "callables.h"
 #include <cctz/civil_time.h>
 
-SEXP cctz_test_civil_day() {
+extern "C"
+SEXP rcctz_test_civil_day() {
   cctz::civil_day d(2016, 2, 1);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, 3));
@@ -16,13 +17,14 @@ SEXP cctz_test_civil_day() {
   return out;
 }
 
-SEXP cctz_test_lookup_civil(SEXP year,
-                            SEXP month,
-                            SEXP day,
-                            SEXP hour,
-                            SEXP minute,
-                            SEXP second,
-                            SEXP tzone) {
+extern "C"
+SEXP rcctz_lookup_civil(SEXP year,
+                        SEXP month,
+                        SEXP day,
+                        SEXP hour,
+                        SEXP minute,
+                        SEXP second,
+                        SEXP tzone) {
   cctz::civil_second cs = cctz::civil_second(
     INTEGER(year)[0],
     INTEGER(month)[0],
@@ -49,4 +51,9 @@ SEXP cctz_test_lookup_civil(SEXP year,
 
   UNPROTECT(1);
   return out;
+}
+
+extern "C"
+SEXP rcctz_tz_local() {
+  return Rf_ScalarString(Rf_mkCharCE(tz_local(), CE_UTF8));
 }

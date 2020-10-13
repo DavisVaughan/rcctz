@@ -1,5 +1,4 @@
 #include "callables.h" // Must be included before R headers
-#include "exports.h"
 
 #include <R.h>
 #include <Rinternals.h>
@@ -7,11 +6,15 @@
 #include <stdbool.h> // for bool
 #include <R_ext/Rdynload.h>
 
+extern "C" SEXP rcctz_test_civil_day();
+extern "C" SEXP rcctz_lookup_civil(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern "C" SEXP rcctz_tz_local();
+
 // .Call entries
 static const R_CallMethodDef CallEntries[] = {
-  {"export_cctz_test_civil_day",    (DL_FUNC) &export_cctz_test_civil_day, 0},
-  {"export_cctz_test_lookup_civil", (DL_FUNC) &export_cctz_test_lookup_civil, 7},
-  {"export_tz_local",               (DL_FUNC) &export_tz_local, 0},
+  {"rcctz_test_civil_day",      (DL_FUNC) &rcctz_test_civil_day, 0},
+  {"rcctz_lookup_civil",        (DL_FUNC) &rcctz_lookup_civil, 7},
+  {"rcctz_tz_local",            (DL_FUNC) &rcctz_tz_local, 0},
   {NULL, NULL, 0}
 };
 
