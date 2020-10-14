@@ -33,8 +33,8 @@ test_that("civil second conversion works", {
   expect1 <- as.POSIXct("1970-04-26 03:00:00", tz = "America/New_York")
   expect2 <- as.POSIXct("1970-04-26 03:00:00", tz = "America/Los_Angeles")
 
-  expect3 <- as.POSIXct("1970-10-25 01:01:00", tz = "America/New_York")
-  expect4 <- as.POSIXct("1970-10-25 01:01:00", tz = "America/Los_Angeles")
+  expect3 <- new_posixct(25678860, "America/New_York")
+  expect4 <- new_posixct(25689660, "America/Los_Angeles")
 
   expect_identical(gap1, expect1)
   expect_identical(gap2, expect2)
