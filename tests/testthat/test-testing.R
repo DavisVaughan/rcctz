@@ -103,6 +103,10 @@ test_that("`TZ` is used if set", {
 })
 
 test_that("`TZ` warns if set to empty string and falls back to system tz", {
+  # Windows `Sys.setenv(FOO = "")` unsets the envvar on Windows,
+  # see `?Sys.setenv` Details
+  skip_on_os("windows")
+
   skip_if_bad_sys_timezone()
 
   expect_identical(
