@@ -80,19 +80,6 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      - name: Install article dependencies
-        run: |
-          remotes::install_cran("cpp11")
-          remotes::install_cran("brio")
-          remotes::install_cran("callr")
-          remotes::install_cran("cli")
-          remotes::install_cran("decor")
-          remotes::install_cran("desc")
-          remotes::install_cran("glue")
-          remotes::install_cran("tibble")
-          remotes::install_cran("vctrs")
-        shell: Rscript {0}
-
       - name: Session info
         run: |
           options(width = 100)
