@@ -35,6 +35,22 @@ cctz::civil_second convert_seconds_point(const seconds_point& sp,
  * https://github.com/vspinu/timechange/blob/9c1f769a6c85899665af8b86e43115d392c09989/src/tzone.cpp#L4
  */
 
+/*
+ * Extract a string time zone from an R `tzone` attribute
+ *
+ * This is slightly different from the lubridate version. For POSIXlt objects,
+ * the time zone attribute might be a character vector of length 3.
+ * If the first element is `""` (which happens on a Mac with
+ * `as.POSIXlt(Sys.time())`), then lubridate will look to the second element
+ * and will use that as the time zone. I think this is incorrect, because those
+ * are always time zone abbreviations, and will fail to load because they
+ * aren't true time zone names. I think that is the reason Vitalie opened
+ * this issue, and the reason for the time zone map in lubridate. This function
+ * works more like `lubridate:::tz.POSIXt()` which just takes the first element
+ * of the tzone attribute.
+ * https://github.com/google/cctz/issues/46
+ * https://github.com/tidyverse/lubridate/blob/b9025e6d5152f9da3857d7ef18f2571d3d861bae/src/update.cpp#L49
+ */
 std::string tz_from_tzone(SEXP tzone) {
   if (tzone == R_NilValue) {
     return "";
@@ -52,12 +68,6 @@ std::string tz_from_tzone(SEXP tzone) {
   }
 
   const char* out = CHAR(STRING_ELT(tzone, 0));
-
-  if (std::strlen(out) == 0 && n > 1) {
-    // We have a `""`, but if this came from POSIXlt then
-    // there might be a real time zone in the second slot
-    out = CHAR(STRING_ELT(tzone, 1));
-  }
 
   return out;
 }
