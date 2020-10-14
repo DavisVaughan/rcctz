@@ -1,0 +1,206 @@
+---
+title: "Using rcctz"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rcctz}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+# Must library the package to register C callables
+library(rcctz)
+library(cpp11)
+```
+
+## Setup
+
+rcctz exposes a small but extremely useful API for working with time zones from C++. To use it from your own package, there are a few steps involved.
+
+First, both import and link to rcctz. This can be done easily with:
+
+```r
+usethis::use_package("rcctz", type = "Imports")
+usethis::use_package("rcctz", type = "LinkingTo")
+```
+
+Next, you'll need to ensure that rcctz is loaded completely when your package is loaded by a user. This registers the rcctz C callables that the API calls out to. To do this, add an `.onLoad()` hook that looks like this:
+
+```r
+.onLoad <- function(libname, pkgname) {
+  requireNamespace("rcctz", quietly = TRUE)
+}
+```
+
+This should be enough to start using rcctz. There is a `rcctz.h` header provided that gives complete access to the API. Inside that header is a `rcctz::` namespace, everything in this namespace comprises the API of rcctz. It attempts to mirror the API of CCTZ as closely as possible.
+
+## Example
+
+For a quick example, here is how we could use rcctz with cpp11. You can call `usethis::use_cpp11()` to set up cpp11 for your own package. In this Rmd document, I've used a cpp11 knitr code chunk and I've linked to rcctz with the attribute `[[cpp11::linking_to("rcctz")]]`. You won't need to do that in package code because you'll have added rcctz to LinkingTo already.
+
+```{cpp11}
+#include <cpp11.hpp>
+#include <rcctz.h>
+
+[[cpp11::linking_to("rcctz")]]
+[[cpp11::register]]
+cpp11::doubles lookup_origin(cpp11::strings tzone) {
+  // Construct a "civil time" object, which is separate from any time zone
+  rcctz::civil_day cd = rcctz::civil_day(1970, 1, 1);
+
+  // "Load" the user specified time zone into a `rcctz::time_zone` object
+  rcctz::time_zone tz;
+  std::string cpp_tz = rcctz::tz_from_tzone(tzone);
+  if (!rcctz::tz_load(cpp_tz, &tz)) {
+    cpp11::stop("Failed to load time zone.");
+  }
+
+  // "Lookup" the civil time in the user supplied time zone. This finds
+  // the numeric "absolute time" of that particular time in the specified time
+  // zone. The absolute time is the number of seconds since 1970-01-01 in UTC.
+  rcctz::time_zone::civil_lookup cl = tz.lookup(cd);
+
+  // Construct a POSIXct object
+  cpp11::writable::doubles out(1);
+  out.attr("class") = {"POSIXct", "POSIXt"};
+  out.attr("tzone") = cpp_tz;
+  
+  // Dig into the civil_lookup to get the actual number of seconds since
+  // an origin of 1970-01-01 UTC, this is our POSIXct value
+  out[0] = cl.trans.time_since_epoch().count();
+
+  return out;
+}
+```
+
+```{r}
+x <- lookup_origin("America/New_York")
+y <- lookup_origin("Europe/Lisbon")
+
+# These have the same clock time
+x
+y
+
+# But very different numeric representations (i.e. absolute times)
+unclass(x)
+unclass(y)
+```
+
+## Skipped and repeated dates
+
+One neat thing about `tz.lookup()` with a civil time is that you get information about whether or not that date actually existed in the time zone used. You can use this information to make decisions about what to return in these corner cases.
+
+In this example, we create a simple version of `lubridate::force_tz()` that handles skipped/repeated dates.
+
+```{cpp11}
+#include <cpp11.hpp>
+#include <rcctz.h>
+
+[[cpp11::linking_to("rcctz")]]
+[[cpp11::register]]
+cpp11::doubles force_tz(cpp11::doubles x, cpp11::strings tzone) {
+  if (x.size() != 1) {
+    cpp11::stop("This example should take an input of size 1.");
+  }
+
+  int64_t val = (int64_t) x[0];
+  rcctz::seconds sec(val);
+  rcctz::seconds_point sp(sec);
+
+  rcctz::time_zone tz_from;
+  std::string cpp_tz_from = rcctz::tz_from_tzone(x.attr("tzone"));
+  if (!rcctz::tz_load(cpp_tz_from, &tz_from)) {
+    cpp11::stop("Failed to load time zone.");
+  }
+
+  rcctz::time_zone tz_to;
+  std::string cpp_tz_to = rcctz::tz_from_tzone(tzone);
+  if (!rcctz::tz_load(cpp_tz_to, &tz_to)) {
+    cpp11::stop("Failed to load time zone.");
+  }
+
+  // Convert absolute number of seconds to a civil time free of any time zones
+  rcctz::civil_second cs = rcctz::convert(sp, tz_from);
+
+  // Convert that civil time over to a
+  // time-zone-specific absolute number of seconds
+  rcctz::time_zone::civil_lookup cl = tz_to.lookup(cs);
+
+  cpp11::writable::doubles out(1);
+  out.attr("class") = {"POSIXct", "POSIXt"};
+  out.attr("tzone") = cpp_tz_to;
+
+  // There is no guarantee that `x` exists in the new time zone, so we have
+  // to check `cl.kind` and adapt accordingly
+  switch (cl.kind) {
+  case rcctz::time_zone::civil_lookup::UNIQUE: {
+    // It did exist, and was unique
+    out[0] = cl.trans.time_since_epoch().count();
+    break;
+  }
+  case rcctz::time_zone::civil_lookup::SKIPPED: {
+    // That time does not exist in this time zone. We are in a DST gap!
+    // Choose to return NA here.
+    out[0] = NA_REAL;
+    break;
+  }
+  case rcctz::time_zone::civil_lookup::REPEATED: {
+    // The time existed, but is ambiguous due to DST fallbacks
+    // We default to choosing the time computed using the
+    // pre-transition UTC offset
+    out[0] = cl.pre.time_since_epoch().count();
+    break;
+  }
+  }
+
+  return out;
+}
+```
+```{r}
+x <- as.POSIXct("2020-01-01", tz = "America/New_York")
+x
+
+# Force the same clock time in a different time zone
+force_tz(x, "Australia/Queensland")
+```
+
+```{r}
+x <- as.POSIXct("1970-04-26 02:20:00", tz = "UTC")
+
+# This time didn't exist in this time zone because there was a DST gap.
+# One second after 01:59:59, the time jumped 1 hour forward to 03:00:00.
+force_tz(x, "America/New_York")
+```
+
+```{r}
+x <- as.POSIXct("1970-10-25 01:20:00", tz = "UTC")
+
+# This time actually exists twice in this time zone. Once during EDT and
+# again during EST. One second after 01:59:59, the clocks rolled back 1 hour
+# and it was again 01:00:00. In these cases we have decided to always use
+# the pre-transition UTC offset for computing the time, which gives us the
+# "first" occurrence of that time
+force_tz(x, "America/New_York")
+
+# Here is the second, 1 hour later
+force_tz(x, "America/New_York") + (60 * 60)
+```
+
+## Caveats and restrictions
+
+There are a few extra things to know about the `rcctz::` namespace, especially if you already know how to use CCTZ.
+
+First off, when you `#include <rcctz.h>` this actually gives you access to the `cctz::` namespace as well. Please do not use it. Functions like `cctz::convert()` will not work, as you only have access to the headers, not the implementations. You should be able to create all of the CCTZ objects you need with the rcctz namespace.
+
+CCTZ has templated variants for `cctz::convert()` and `cctz::time_zone::lookup()` that take a `time_point<T>`, where `T` is a duration type like seconds or hours. It seems impossible to create a C callable for a template function like this, so rcctz has chosen to only expose the explicit variant for seconds. This is all that is generally required by R packages anyways. rcctz exposes `rcctz::seconds_point` as an alias of `time_point<cctz::seconds>` which should be used with the non-template versions of `rcctz::convert()` and `rcctz::time_zone::lookup()`.
+
+CCTZ has `cctz::load_time_zone()`. In rcctz, the way to do this is with `rcctz::tz_load()`. This has some special behavior when the local time zone is needed that is specific to R.
+
+While not obviously apparent, arithmetic can be performed on the civil period objects like `rcctz::civil_day` and `rcctz::civil_second`. The arithmetic is done at the period level of the specified type (i.e. `<civil_day> + 2` would add two days).

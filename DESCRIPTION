@@ -21,7 +21,10 @@ BugReports: https://github.com/DavisVaughan/rcctz/issues
 Suggests: 
     covr,
     testthat,
-    withr
+    withr,
+    knitr,
+    rmarkdown,
+    cpp11
 Config/testthat/edition: 2
 Encoding: UTF-8
 LazyData: true
@@ -29,3 +32,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 SystemRequirements: C++11, A system with zoneinfo data (e.g.
     /usr/share/zoneinfo). On Windows the zoneinfo included with R is used.
+VignetteBuilder: knitr
