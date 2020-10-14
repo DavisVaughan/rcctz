@@ -20,8 +20,6 @@ URL: https://github.com/DavisVaughan/rcctz
 BugReports: https://github.com/DavisVaughan/rcctz/issues
 Suggests: 
     covr,
-    cpp11,
-    decor,
     knitr,
     rmarkdown,
     testthat,

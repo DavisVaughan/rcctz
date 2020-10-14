@@ -1,0 +1,7 @@
+development:
+  mode: auto
+
+navbar:
+  left:
+  - text: Get started
+    href: articles/rcctz.html
