@@ -2,7 +2,7 @@
 title: "Using rcctz"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rcctz}
+  %\VignetteIndexEntry{Using rcctz}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
