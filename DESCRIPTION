@@ -8,10 +8,13 @@ Authors@R:
              email = "davis@rstudio.com"),
       person(given = "RStudio",
              role = "cph"))
-Description: Provides access to the 'CCTZ' headers. 'CCTZ'
-    contains two libraries that cooperate with the C++ 'chrono' library to
-    give C++ programmers all the necessary tools for computing with dates,
-    times, and time zones in a simple and correct manner.
+Description: Provides C++ level access to the 'CCTZ' headers.
+    'CCTZ' contains two libraries that cooperate with the C++ 'chrono'
+    library to give C++ programmers all the necessary tools for computing
+    with dates, times, and time zones in a simple and correct manner. The
+    'CCTZ' source code, released under the Apache 2.0 License, is included
+    in this package. See <https://github.com/google/cctz> for more
+    details.
 License: Apache License (>= 2)
 URL: https://github.com/DavisVaughan/rcctz
 BugReports: https://github.com/DavisVaughan/rcctz/issues
@@ -24,4 +27,5 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-SystemRequirements: C++11
+SystemRequirements: C++11, A system with zoneinfo data (e.g.
+    /usr/share/zoneinfo). On Windows the zoneinfo included with R is used.
