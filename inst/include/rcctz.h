@@ -73,6 +73,14 @@ namespace rcctz {
       return fn(name, &tz_);
     }
 
+    // Relational operators.
+    friend bool operator==(time_zone lhs, time_zone rhs) {
+      return lhs.tz_ == rhs.tz_;
+    }
+    friend bool operator!=(time_zone lhs, time_zone rhs) {
+      return !(lhs.tz_ == rhs.tz_);
+    }
+
   private:
     cctz::time_zone tz_;
   }; // class time_zone
