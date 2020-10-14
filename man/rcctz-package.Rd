@@ -6,10 +6,13 @@
 \alias{rcctz-package}
 \title{rcctz: Vendor 'CCTZ' Headers}
 \description{
-Provides access to the 'CCTZ' headers. 'CCTZ'
-    contains two libraries that cooperate with the C++ 'chrono' library to
-    give C++ programmers all the necessary tools for computing with dates,
-    times, and time zones in a simple and correct manner.
+Provides C++ level access to the 'CCTZ' headers.
+    'CCTZ' contains two libraries that cooperate with the C++ 'chrono'
+    library to give C++ programmers all the necessary tools for computing
+    with dates, times, and time zones in a simple and correct manner. The
+    'CCTZ' source code, released under the Apache 2.0 License, is included
+    in this package. See <https://github.com/google/cctz> for more
+    details.
 }
 \seealso{
 Useful links:
