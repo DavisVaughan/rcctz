@@ -62,20 +62,20 @@ SEXP rcctz_convert_civil(SEXP year,
     Rf_errorcall(R_NilValue, "Failed to load time zone.");
   }
 
-  cctz::time_point<cctz::seconds> tp = convert_civil(cs, tz);
+  seconds_point sp = convert_civil(cs, tz);
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, 1));
 
-  REAL(out)[0] = tp.time_since_epoch().count();
+  REAL(out)[0] = sp.time_since_epoch().count();
 
   UNPROTECT(1);
   return out;
 }
 
 extern "C"
-SEXP rcctz_lookup_time_point(SEXP point, SEXP tzone) {
+SEXP rcctz_lookup_seconds_point(SEXP point, SEXP tzone) {
   cctz::seconds sec(INTEGER(point)[0]);
-  cctz::time_point<cctz::seconds> tp(sec);
+  seconds_point sp(sec);
 
   cctz::time_zone tz;
   std::string cpp_tz = tz_from_tzone(tzone);
@@ -84,7 +84,7 @@ SEXP rcctz_lookup_time_point(SEXP point, SEXP tzone) {
     Rf_errorcall(R_NilValue, "Failed to load time zone.");
   }
 
-  cctz::time_zone::absolute_lookup lookup = lookup_time_point(tp, tz);
+  cctz::time_zone::absolute_lookup lookup = lookup_seconds_point(sp, tz);
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 3));
 
@@ -105,9 +105,9 @@ SEXP rcctz_lookup_time_point(SEXP point, SEXP tzone) {
 }
 
 extern "C"
-SEXP rcctz_convert_time_point(SEXP point, SEXP tzone) {
+SEXP rcctz_convert_seconds_point(SEXP point, SEXP tzone) {
   cctz::seconds sec(INTEGER(point)[0]);
-  cctz::time_point<cctz::seconds> tp(sec);
+  seconds_point sp(sec);
 
   cctz::time_zone tz;
   std::string cpp_tz = tz_from_tzone(tzone);
@@ -116,7 +116,7 @@ SEXP rcctz_convert_time_point(SEXP point, SEXP tzone) {
     Rf_errorcall(R_NilValue, "Failed to load time zone.");
   }
 
-  cctz::civil_second cs = convert_time_point(tp, tz);
+  cctz::civil_second cs = convert_seconds_point(sp, tz);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, 6));
   INTEGER(out)[0] = cs.year();
@@ -139,7 +139,7 @@ SEXP rcctz_force_tz(SEXP x, SEXP tzone_from, SEXP tzone_to, SEXP dst) {
   bool dst_missing = !strcmp(c_dst, "missing");
 
   cctz::seconds sec(INTEGER(x)[0]);
-  cctz::time_point<cctz::seconds> tp(sec);
+  seconds_point sp(sec);
 
   cctz::time_zone tz_from;
   std::string cpp_tz_from = tz_from_tzone(tzone_from);
@@ -154,7 +154,7 @@ SEXP rcctz_force_tz(SEXP x, SEXP tzone_from, SEXP tzone_to, SEXP dst) {
     Rf_errorcall(R_NilValue, "Failed to load time zone.");
   }
 
-  cctz::civil_second cs = convert_time_point(tp, tz_from);
+  cctz::civil_second cs = convert_seconds_point(sp, tz_from);
   cctz::time_zone::civil_lookup cl = lookup_civil(cs, tz_to);
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, 1));

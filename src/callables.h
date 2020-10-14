@@ -5,23 +5,26 @@
 #include <cctz/time_zone.h>
 #include "r.h"
 
+// Same as the `seconds_point` exposed in `rcctz.h`
+using seconds_point = cctz::time_point<cctz::seconds>;
+
 // -----------------------------------------------------------------------------
 // Civil
 
 cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
                                            const cctz::time_zone& tz);
 
-cctz::time_point<cctz::seconds> convert_civil(const cctz::civil_second& cs,
-                                              const cctz::time_zone& tz);
+seconds_point convert_civil(const cctz::civil_second& cs,
+                            const cctz::time_zone& tz);
 
 // -----------------------------------------------------------------------------
 // Time point
 
-cctz::time_zone::absolute_lookup lookup_time_point(const cctz::time_point<cctz::seconds>& tp,
-                                                   const cctz::time_zone& tz);
+cctz::time_zone::absolute_lookup lookup_seconds_point(const seconds_point& sp,
+                                                      const cctz::time_zone& tz);
 
-cctz::civil_second convert_time_point(const cctz::time_point<cctz::seconds>& tp,
-                                      const cctz::time_zone& tz);
+cctz::civil_second convert_seconds_point(const seconds_point& sp,
+                                         const cctz::time_zone& tz);
 
 // -----------------------------------------------------------------------------
 // Time zone loading

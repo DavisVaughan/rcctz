@@ -47,7 +47,7 @@ namespace rcctz {
 
     inline absolute_lookup lookup(const seconds_point& sp) const {
       typedef absolute_lookup fn_ptr(const seconds_point& sp, const cctz::time_zone& tz);
-      static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "lookup_time_point");
+      static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "lookup_seconds_point");
       return fn(sp, tz_);
     }
     inline civil_lookup lookup(const civil_second& cs) const {
@@ -58,7 +58,7 @@ namespace rcctz {
 
     inline civil_second convert(const seconds_point& sp) const {
       typedef civil_second fn_ptr(const seconds_point& sp, const cctz::time_zone& tz);
-      static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "convert_time_point");
+      static fn_ptr *fn = (fn_ptr*) R_GetCCallable("rcctz", "convert_seconds_point");
       return fn(sp, tz_);
     }
     inline seconds_point convert(const civil_second& cs) const {

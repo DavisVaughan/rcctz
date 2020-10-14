@@ -9,22 +9,22 @@ cctz::time_zone::civil_lookup lookup_civil(const cctz::civil_second& cs,
   return tz.lookup(cs);
 }
 
-cctz::time_point<cctz::seconds> convert_civil(const cctz::civil_second& cs,
-                                              const cctz::time_zone& tz) {
+seconds_point convert_civil(const cctz::civil_second& cs,
+                            const cctz::time_zone& tz) {
   return cctz::convert(cs, tz);
 }
 
 // -----------------------------------------------------------------------------
 // Time point
 
-cctz::time_zone::absolute_lookup lookup_time_point(const cctz::time_point<cctz::seconds>& tp,
-                                                   const cctz::time_zone& tz) {
-  return tz.lookup(tp);
+cctz::time_zone::absolute_lookup lookup_seconds_point(const seconds_point& sp,
+                                                      const cctz::time_zone& tz) {
+  return tz.lookup(sp);
 }
 
-cctz::civil_second convert_time_point(const cctz::time_point<cctz::seconds>& tp,
-                                      const cctz::time_zone& tz) {
-  return cctz::convert(tp, tz);
+cctz::civil_second convert_seconds_point(const seconds_point& sp,
+                                         const cctz::time_zone& tz) {
+  return cctz::convert(sp, tz);
 }
 
 // -----------------------------------------------------------------------------
